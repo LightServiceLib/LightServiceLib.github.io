@@ -1,6 +1,6 @@
 /**
  * lightservice - Simple and convinient interface for service consumption
- * @version v8.2.0
+ * @version v9.0.0
  * @link https://github.com/contactsamie/LightService
  * @license MIT
  * @license Samuel Bamgboye <contactsamie@gmail.com> 

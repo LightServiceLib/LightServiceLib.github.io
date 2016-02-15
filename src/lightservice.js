@@ -1,6 +1,6 @@
 /**
  * lightservice - Simple and convinient interface for service consumption
- * @version v8.2.0
+ * @version v9.0.0
  * @link https://github.com/contactsamie/LightService
  * @license MIT
  * @license Samuel Bamgboye <contactsamie@gmail.com> 
@@ -12,7 +12,10 @@ var light = (typeof light === "undefined") ? (function () {
 
         var incontext = {
             event: INTERNAL.systemServices,
-            service: chainService(),
+            serviceChain: chainService,
+            service: function () {
+                return chainService(undefined, true);
+            },
             arg: arg,
             system: INTERNAL.system,
             store: INTERNAL._STORE_[storeName].api(store)
@@ -215,7 +218,7 @@ var light = (typeof light === "undefined") ? (function () {
         for (var i = 0; i < total; i++) {
             var receiver = INTERNAL.messageReceivers[messageName][i];
             _light(function () {
-                this.service[receiver.link](messageArg).result();
+                this.serviceChain()[receiver.link](messageArg).result();
             });
         }
     };
@@ -278,7 +281,7 @@ var light = (typeof light === "undefined") ? (function () {
 
     var setUpNotification = function (id) {
         return createEventEmitter(id, function (item, o, context, notificationInfo) {
-            INTERNAL.utility.tryCatch(context, function () { return item.service(); }, function () { }, function () { INTERNAL.utility.execSurpressError(item.service.error, o, context, notificationInfo); });
+            INTERNAL.utility.tryCatch(context, function () { return item.service(); }, function () { }, function () { INTERNAL.utility.execSurpressError(item.service().error, o, context, notificationInfo); });
         });
     };
 
@@ -630,7 +633,7 @@ var light = (typeof light === "undefined") ? (function () {
         cb();
     }
 
-    var chainService = function (cb) {
+    var chainService = function (cb,noChain) {
         chainService.totalChain = chainService.totalChain || 0;
 
         var chain = {};
@@ -650,7 +653,7 @@ var light = (typeof light === "undefined") ? (function () {
                     var previousOrMostCurrentResultToBePassedToTheNextActor = JSON.parse(JSON.stringify(res)).previousOrMostCurrentResultToBePassedToTheNextActor;
 
                     result = INTERNAL.systemServices[serviceName](previousOrMostCurrentResultToBePassedToTheNextActor);
-                    return chain;
+                    return noChain?result: chain;
                 };
             })(actor);
         };
@@ -740,7 +743,7 @@ var light = (typeof light === "undefined") ? (function () {
         test: function (setup, f) {
             INTERNAL._TEST_OBJECTS_ = setup;
 
-            f.call(INTERNAL.getCurrentContext(INTERNAL._INTERNAL_SCOPE_NAME, chainService()), chainService());
+            f.call(INTERNAL.getCurrentContext(INTERNAL._INTERNAL_SCOPE_NAME, chainService), chainService);
             INTERNAL._TEST_OBJECTS_ = undefined
         },
         play: function (records, i, j) {

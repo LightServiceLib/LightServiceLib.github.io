@@ -257,7 +257,7 @@ Licensed under The MIT License (http://opensource.org/licenses/MIT)
 
 /**
  * lightservice - Simple and convinient interface for service consumption
- * @version v8.2.0
+ * @version v9.0.0
  * @link https://github.com/contactsamie/LightService
  * @license MIT
  * @license Samuel Bamgboye <contactsamie@gmail.com> 
@@ -313,7 +313,7 @@ light.service("addNode", function (arg) {
 });
 light.service("connect", function (arg) {
     if (!nodes[arg.from]) {
-        this.service.addNode({
+        this.serviceChain().addNode({
             id: arg.from,
             error: arg.fromError,
             success: arg.fromSuccess,
@@ -322,7 +322,7 @@ light.service("connect", function (arg) {
         });
     }
     if (!nodes[arg.to]) {
-        this.service.addNode({
+        this.serviceChain().addNode({
             id: arg.to,
             error: arg.toError,
             success: arg.toSuccess,
@@ -359,7 +359,7 @@ light.service("draw", function (arg) {
 });
 light.receive("UI_RESPONSE_TO_EVENT_CHANGE_MESSAGE", function (arg) {
     arg = arg || {};
-    var records = this.service.timemachine_record().result();
+    var records = this.serviceChain().timemachine_record().result();
     for (var i = 0; i < records.length; i++) {
         var currentRecord = records[i];
         var nextRecord = records[i + 1] || {
@@ -378,9 +378,9 @@ light.receive("UI_RESPONSE_TO_EVENT_CHANGE_MESSAGE", function (arg) {
             from: (arg.useShortNames ? currentRecord.position : ((currentRecord.dataType === "argument" ? "in:" : "out:") + currentRecord.methodType + ":" + currentRecord.methodName)) + (arg.streatchOutCalls ? ("# " + currentRecord.position) : ""),
             to: (arg.useShortNames ? nextRecord.position : ((nextRecord.dataType === "argument" ? "in:" : "out:") + nextRecord.methodType + ":" + nextRecord.methodName)) + (arg.streatchOutCalls ? ("# " + nextRecord.position) : ""),
         };
-        this.service.connect(connectObj);
+        this.serviceChain().connect(connectObj);
     }
-    this.service.draw(arg);
+    this.serviceChain().draw(arg);
 });
 
 
